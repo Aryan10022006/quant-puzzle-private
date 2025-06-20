@@ -26,7 +26,7 @@ console.log('👤 Admin Email:', process.env.ADMIN_EMAIL || 'Not configured');
 
 // Middleware
 app.use(cors({
-  origin: ['http://192.168.56.1:8080', 'http://localhost:5000', 'http://192.168.56.1:8081','http://localhost:8080'], // frontend origins
+  origin: ['https://quant-puzzle.vercel.app', 'http://localhost:5000', 'http://192.168.56.1:8081','http://localhost:8080'], // frontend origins
   credentials: true
 }));
 app.use(express.json());
