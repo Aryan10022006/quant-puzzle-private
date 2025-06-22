@@ -59,7 +59,7 @@ router.get('/:id/correct', async (req, res) => {
     for (const sub of correctSubs) {
       const normalized = sub.name.trim().toLowerCase().replace(/\s+/g, ' ');
       if (!seen.has(normalized)) {
-        unique.push({ name: sub.name, email: sub.email });
+        unique.push({ name: sub.name });
         seen.add(normalized);
       }
     }
