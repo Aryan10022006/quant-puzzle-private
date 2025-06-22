@@ -51,18 +51,16 @@ router.get('/:id/correct', async (req, res) => {
     if (!puzzle) {
       return res.status(404).json({ error: 'Puzzle not found' });
     }
-    if (puzzle.deadline > new Date()) {
-      return res.status(403).json({ error: 'Results available after deadline.' });
-    }
     const correctSubs = await Submission.find({ puzzleId: req.params.id, status: 'correct' })
       .sort({ submittedAt: 1 });
-    // Unique by name
+    // Unique by normalized name
     const unique = [];
     const seen = new Set();
     for (const sub of correctSubs) {
-      if (!seen.has(sub.name)) {
+      const normalized = sub.name.trim().toLowerCase().replace(/\s+/g, ' ');
+      if (!seen.has(normalized)) {
         unique.push({ name: sub.name, email: sub.email });
-        seen.add(sub.name);
+        seen.add(normalized);
       }
     }
     res.json(unique);
