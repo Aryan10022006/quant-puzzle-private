@@ -243,4 +243,38 @@ router.post('/logout', authenticateAdmin, async (req, res) => {
   }
 });
 
+// Update puzzle by ID
+router.patch('/puzzles/:id', authenticateAdmin, async (req, res) => {
+  try {
+    const { title, description, tags, difficulty, format, deadline, solutionFormat, solutionText } = req.body;
+    const updateData = {};
+    if (title) {
+      updateData.title = title;
+      // Update slug if title changes
+      let slug = slugify(title, { lower: true, strict: true });
+      let existing = await Puzzle.findOne({ slug, _id: { $ne: req.params.id } });
+      if (existing) {
+        slug += '-' + Date.now();
+      }
+      updateData.slug = slug;
+    }
+    if (description !== undefined) updateData.description = description;
+    if (tags !== undefined) updateData.tags = typeof tags === 'string' ? tags.split(',').map((tag) => tag.trim()) : tags;
+    if (difficulty) updateData.difficulty = difficulty;
+    if (format) updateData.format = format;
+    if (deadline) updateData.deadline = new Date(deadline);
+    if (solutionFormat) updateData.solutionFormat = solutionFormat;
+    if (solutionText !== undefined) updateData.solutionText = solutionText;
+
+    const puzzle = await Puzzle.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!puzzle) {
+      return res.status(404).json({ error: 'Puzzle not found' });
+    }
+    res.json(puzzle);
+  } catch (error) {
+    console.error('Error updating puzzle:', error);
+    res.status(500).json({ error: 'Failed to update puzzle' });
+  }
+});
+
 export default router;
