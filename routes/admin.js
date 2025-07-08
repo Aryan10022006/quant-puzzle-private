@@ -9,6 +9,7 @@ import Submission from '../models/Submission.js';
 import fs from 'fs';
 import AdminSession from '../models/AdminSession.js';
 import { v4 as uuidv4 } from 'uuid';
+import slugify from 'slugify';
 
 const router = express.Router();
 
@@ -102,6 +103,13 @@ router.post('/puzzles', authenticateAdmin, upload.fields([
   try {
     const { title, description, tags, difficulty, format, deadline, solutionFormat, solutionText } = req.body;
 
+    let slug = slugify(title, { lower: true, strict: true });
+    // Ensure slug is unique
+    let existing = await Puzzle.findOne({ slug });
+    if (existing) {
+      slug += '-' + Date.now();
+    }
+
     const puzzleData = {
       title,
       description,
@@ -110,7 +118,8 @@ router.post('/puzzles', authenticateAdmin, upload.fields([
       format,
       deadline: new Date(deadline),
       solutionFormat,
-      solutionText
+      solutionText,
+      slug
     };
 
     if (req.files?.puzzleFile) {

@@ -51,6 +51,12 @@ const puzzleSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true
   }
 });
 
